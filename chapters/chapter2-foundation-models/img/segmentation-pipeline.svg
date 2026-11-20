@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title description">
+  <title id="title">Chapter 2 pipeline: MedImageParse 3D segmentation and lesion descriptors through MCP</title>
+  <desc id="description">A brain MRI volume path and text prompts go to the segment tool, which calls the MedImageParse 3D foundation model and returns a mask path. The mask path goes to clean_segmentation and describe_lesions, plain Python with no model, which return lesion volumes and diameters. All tools live in the medimageparse MCP server. The descriptors go through a factsheet to the write-report-simple skill from Chapter 1, which writes a draft report. Each step saves its files in an audit-log folder for the image: segment writes axial montages, the mask, and its prompt sidecar; clean_segmentation and describe_lesions write the cleaned and lesion masks, descriptors, and a measurement image; the agent writes the factsheet from the descriptors, and the report skill reads it. The write-report-measured skill orchestrates the calls. Values are illustrative.</desc>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+  <g font-family="Aptos, Segoe UI, Arial, sans-serif" letter-spacing="0">
+    <rect x="30" y="40" width="28" height="5" fill="#087F78"/>
+    <text x="70" y="49" font-size="18" font-weight="700" fill="#526169">CHAPTER 2 / WIRING MEDIMAGEPARSE THROUGH MCP</text>
+
+    <text x="340" y="98" font-size="18" font-weight="700" fill="#526169">MCP SERVER · medimageparse</text>
+    <rect x="340" y="110" width="590" height="335" rx="14" fill="#F7FAF9" stroke="#8EA5A2" stroke-width="2" stroke-dasharray="8 6"/>
+
+    <g fill="#FFFFFF" stroke="#C9D8D5" stroke-width="1.5">
+      <rect x="30" y="170" width="220" height="250" rx="8"/>
+      <rect x="360" y="170" width="220" height="250" rx="8"/>
+      <rect x="690" y="170" width="220" height="250" rx="8"/>
+      <rect x="1020" y="170" width="220" height="250" rx="8"/>
+      <rect x="1350" y="170" width="220" height="250" rx="8"/>
+    </g>
+    <g stroke="#E0E7E5" stroke-width="1">
+      <path d="M46 222 H234 M376 222 H564 M706 222 H894 M1036 222 H1224 M1366 222 H1554"/>
+    </g>
+
+    <g text-anchor="middle" font-size="17" font-weight="700">
+      <text x="140" y="205" fill="#202C32">Brain MRI</text>
+      <text x="470" y="205" fill="#087F78" font-family="Cascadia Mono, Consolas, monospace">segment</text>
+      <text x="800" y="205" fill="#087F78" font-family="Cascadia Mono, Consolas, monospace">describe_lesions</text>
+      <text x="1130" y="205" fill="#202C32" font-family="Cascadia Mono, Consolas, monospace">write-report-simple</text>
+      <text x="1460" y="205" fill="#202C32" font-family="Cascadia Mono, Consolas, monospace">&lt;report&gt;</text>
+    </g>
+
+    <rect x="80" y="245" width="120" height="95" rx="6" fill="#20282D"/>
+    <ellipse cx="140" cy="292" rx="34" ry="42" fill="#B3BABC"/>
+    <ellipse cx="140" cy="292" rx="31" ry="39" fill="#2E363B"/>
+    <ellipse cx="140" cy="292" rx="28" ry="36" fill="#7A8488"/>
+    <ellipse cx="140" cy="294" rx="22" ry="29" fill="#9AA3A6"/>
+    <path d="M140 256 V277 M140 309 V328" stroke="#3A4247" stroke-width="2"/>
+    <path d="M138 281 C132 284 131 296 134 303 C136 300 137 290 138 282 Z" fill="#3A4247"/>
+    <path d="M142 281 C148 284 149 296 146 303 C144 300 143 290 142 282 Z" fill="#3A4247"/>
+    <ellipse cx="153" cy="274" rx="7.5" ry="6" fill="#E6EAE8"/>
+    <ellipse cx="153" cy="274" rx="4" ry="3" fill="#4F585C"/>
+
+    <ellipse cx="470" cy="292" rx="34" ry="42" fill="#EEF4F3" stroke="#8EA5A2" stroke-width="2"/>
+    <path d="M470 250 V276 M470 310 V334" stroke="#B7CBC7" stroke-width="1.5"/>
+    <path d="M467 281 C461 284 460 296 463 303 C465 300 466 290 467 282 Z" fill="#CBDAD8"/>
+    <path d="M473 281 C479 284 480 296 477 303 C475 300 474 290 473 282 Z" fill="#CBDAD8"/>
+    <path d="M473 272 C472 263 480 257 488 258 C497 259 502 265 501 273 C500 281 493 285 486 284 C478 283 473 279 473 272 Z M481 271 C481 267 485 265 488 265 C492 266 494 269 493 273 C492 276 489 278 486 277 C483 277 481 275 481 271 Z" fill="#F4C76D" fill-rule="evenodd" stroke="#BD7C14" stroke-width="1.5"/>
+    <path d="M481 271 C481 267 485 265 488 265 C492 266 494 269 493 273 C492 276 489 278 486 277 C483 277 481 275 481 271 Z" fill="#8FD3BE" stroke="#087F78" stroke-width="1.2"/>
+
+    <path d="M758 292 C756 272 776 259 800 260 C824 261 843 274 842 293 C841 312 822 324 799 323 C776 322 760 311 758 292 Z" fill="#F4C76D" stroke="#BD7C14" stroke-width="2"/>
+    <path d="M780 292 C780 282 790 276 801 277 C813 278 820 285 819 294 C818 303 809 308 799 307 C788 306 780 301 780 292 Z" fill="#8FD3BE" stroke="#087F78" stroke-width="1.5"/>
+    <g fill="none" stroke="#202C32" stroke-width="2" stroke-linecap="round">
+      <path d="M756 295 L844 289 M755.6 288 L756.4 302 M843.6 282 L844.4 296"/>
+      <path d="M797 257 L801 326 M790 257.4 L804 256.6 M794 326.4 L808 325.6"/>
+    </g>
+
+    <rect x="1098" y="248" width="64" height="84" rx="4" fill="#FFFFFF" stroke="#087F78" stroke-width="2.5"/>
+    <path d="M1110 268 H1150 M1110 282 H1150 M1110 296 H1142 M1110 310 H1146" stroke="#8EA5A2" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M1162 238 L1166 247 L1175 251 L1166 255 L1162 264 L1158 255 L1149 251 L1158 247 Z" fill="#087F78" stroke="#FFFFFF" stroke-width="3"/>
+
+    <g font-size="13" font-weight="700" fill="#667873">
+      <text x="1370" y="252">FINDINGS</text>
+    </g>
+    <g font-size="17" fill="#202C32">
+      <text x="1370" y="278">Enhancing mass,</text>
+      <text x="1370" y="301">core 55.1 mL,</text>
+    </g>
+    <text x="1370" y="326" font-size="18" font-weight="700" fill="#956115">6.2 × 4.6 cm</text>
+
+    <g text-anchor="middle">
+      <g font-size="20" font-weight="700" fill="#202C32">
+        <text x="140" y="378">3D volume</text>
+        <text x="470" y="378">MedImageParse</text>
+        <text x="800" y="378">Python geometry</text>
+        <text x="1130" y="378">Chapter 1 skill</text>
+        <text x="1460" y="378">Draft report</text>
+      </g>
+      <g font-size="17" fill="#526169">
+        <text x="140" y="403">NIfTI + voxel spacing</text>
+        <text x="470" y="403">3D foundation model</text>
+        <text x="800" y="403">cleans, then measures</text>
+        <text x="1130" y="403">LLM writes the words</text>
+        <text x="1460" y="403">radiologist reviews</text>
+      </g>
+    </g>
+
+    <g fill="none" stroke="#7D9095" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M260 305 H350 M341 298 L350 305 L341 312"/>
+      <path d="M590 305 H680 M671 298 L680 305 L671 312"/>
+      <path d="M940 305 H1010 M1001 298 L1010 305 L1001 312"/>
+    </g>
+    <path d="M1250 305 H1340 M1331 298 L1340 305 L1331 312" fill="none" stroke="#087F78" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <g text-anchor="middle" font-size="17" fill="#526169">
+      <text x="305" y="266">path +</text>
+      <text x="305" y="288">prompts</text>
+      <text x="635" y="266">mask</text>
+      <text x="635" y="288">path</text>
+      <text x="976" y="266">lesion</text>
+      <text x="976" y="288">sizes</text>
+      <text x="1295" y="288" fill="#087F78">prose</text>
+    </g>
+
+    <text x="30" y="548" font-size="18" font-weight="700" fill="#526169">AUDIT-LOG</text>
+    <text x="30" y="574" font-size="15" fill="#526169">one folder per image</text>
+    <text x="30" y="598" font-size="14" fill="#202C32" font-family="Cascadia Mono, Consolas, monospace">audit-log/&lt;image path&gt;/</text>
+    <rect x="340" y="510" width="920" height="206" rx="14" fill="#FCF8EF" stroke="#E3D3B0" stroke-width="1.5"/>
+
+    <g fill="none" stroke="#8EA5A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M470 424 V504 M800 424 V504" stroke-dasharray="5 6"/>
+      <path d="M464 497 L470 505 L476 497 M794 497 L800 505 L806 497"/>
+    </g>
+    <g fill="none" stroke="#7D9095" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M919 630 H1009 M1002 623 L1010 630 L1002 637"/>
+      <path d="M1130 610 V426 M1123 434 L1130 425 L1137 434"/>
+    </g>
+    <g font-size="15" fill="#526169">
+      <text x="480" y="484">writes</text>
+      <text x="810" y="484">writes</text>
+      <text x="1140" y="484">reads</text>
+    </g>
+
+    <g fill="#FFFFFF" stroke="#E3D3B0" stroke-width="1.2">
+      <rect x="355" y="530" width="230" height="32" rx="6"/>
+      <rect x="355" y="572" width="230" height="32" rx="6"/>
+      <rect x="355" y="614" width="230" height="32" rx="6"/>
+      <rect x="355" y="656" width="230" height="32" rx="6"/>
+      <rect x="685" y="530" width="230" height="32" rx="6"/>
+      <rect x="685" y="572" width="230" height="32" rx="6"/>
+      <rect x="685" y="614" width="230" height="32" rx="6"/>
+      <rect x="685" y="656" width="230" height="32" rx="6"/>
+      <rect x="1015" y="614" width="230" height="32" rx="6" stroke="#087F78" stroke-width="1.5"/>
+    </g>
+    <g font-size="14" fill="#202C32" font-family="Cascadia Mono, Consolas, monospace">
+      <text x="367" y="551">axial-montage.png</text>
+      <text x="367" y="593">&lt;stem&gt;.axial-montage.png</text>
+      <text x="367" y="635">&lt;stem&gt;.nii.gz</text>
+      <text x="367" y="677">&lt;stem&gt;.json</text>
+      <text x="697" y="551">&lt;stem&gt;.clean.*</text>
+      <text x="697" y="593">&lt;stem&gt;.lesions.nii.gz</text>
+      <text x="697" y="635">&lt;stem&gt;.descriptors.json</text>
+      <text x="697" y="677">&lt;stem&gt;.measurements.png</text>
+      <text x="1027" y="635">&lt;stem&gt;.factsheet.md</text>
+    </g>
+    <g text-anchor="middle" font-size="15" fill="#526169">
+      <text x="1130" y="675">written by the agent,</text>
+      <text x="1130" y="695">read by the report skill</text>
+    </g>
+
+    <path d="M470 732 V744 H1130 V732" fill="none" stroke="#8EA5A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="800" y="773" text-anchor="middle" font-size="19" fill="#526169"><tspan font-family="Cascadia Mono, Consolas, monospace" font-weight="700" fill="#202C32">write-report-measured</tspan> runs the tools through a factsheet, then the report skill</text>
+
+    <text x="800" y="832" text-anchor="middle" font-size="24" font-weight="700" fill="#087F78">Models return masks · code returns facts · the LLM writes words</text>
+    <text x="1570" y="874" text-anchor="end" font-size="15" fill="#73827F">Illustrative values. Not for clinical use.</text>
+  </g>
+</svg>

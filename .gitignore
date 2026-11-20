@@ -1,0 +1,13 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+
+# MCP server audit trail: masks, descriptors, review images, factsheets
+audit-log/
+outputs/
+
+# agent scratch space (code and images the Radiology Assistant creates)
+sandbox/*
+!sandbox/.gitkeep

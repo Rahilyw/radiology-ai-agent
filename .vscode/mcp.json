@@ -1,0 +1,15 @@
+{
+  "servers": {
+    "medimageparse": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "${workspaceFolder}/mcp/medimageparse-server",
+        "mcp",
+        "run",
+        "server.py"
+      ]
+    }
+  }
+}
